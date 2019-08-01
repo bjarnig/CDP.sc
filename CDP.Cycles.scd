@@ -4,6 +4,7 @@
 //
 ////////////////////////////////////////////////////////////////
 
+(
 
 // Set the directory to your working directory or specify it per process
 ~directory = "/Users/bjarni/Desktop/material/code/source/"; // thisProcess.nowExecutingPath.dirname;
