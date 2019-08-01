@@ -25,7 +25,7 @@ CDPCross(
  	[
 		(name:"leafsize", prepend:"-f", spec: ControlSpec(10, 40, \linear, 2, 20)),
 		(name:"lopass", prepend:"-l", spec: ControlSpec(8, 20, \linear, 2, 4))
-	]));
+	]);
 )
 
 

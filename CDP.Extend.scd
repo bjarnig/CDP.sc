@@ -69,7 +69,7 @@ CDPGui(
 ( // Drunk, drunken walk through source file
 
 CDPGui(
-	"extend drunk 1", "Drunk",
+	"extend drunk 1", "Drunk", ~directory,
 	[
 		(name:"dur", prepend:"", spec: ControlSpec(1, 20, \linear, 0.1)),
 		(name:"locus", prepend:"", spec: ControlSpec(0.01, 1.0, \linear, 0.01)),
