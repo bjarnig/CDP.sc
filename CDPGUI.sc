@@ -7,7 +7,7 @@
 
 CDPGui {
 
-*view {|processName, infoText, directory, processParams|
+*new {|processName, infoText, directory, processParams|
 
 var win, menu, soundMenu, playing;
 var headerLabel, processLabel, processButton, playButton, soundLabel, paramsLabel;

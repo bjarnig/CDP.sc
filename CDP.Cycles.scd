@@ -7,7 +7,7 @@
 (
 
 // Set the directory to your working directory or specify it per process
-~directory = "/Users/bjarni/Desktop/material/code/source/"; // thisProcess.nowExecutingPath.dirname;
+~directory = "/Users/bjarni/Courses/Classes/CWA/18 - Transformation (CDP)/code/source/"; // thisProcess.nowExecutingPath.dirname;
 
 s.boot; // Boot the server for playback
 
@@ -18,9 +18,9 @@ s.boot; // Boot the server for playback
 
 ( // Delete, Time-contract by telescoping N wavecycles into 1
 
-CDPGui.view(
- 	"distort delete 2", "Delete", ~directory,
- 	[
+CDPGui(
+    "distort delete 2", "Delete", ~directory,
+    [
     (name:"delete", prepend:"", spec: ControlSpec(4, 32, \linear, 1))
     ]
 );
@@ -30,9 +30,9 @@ CDPGui.view(
 
 ( // Repeat, Time-expand by repeating N wavecycles
 
-CDPGui.view(
- 	"distort repeat", "Repeat", , ~directory,
- 	[
+CDPGui(
+    "distort repeat", "Repeat", ~directory,
+    [
     (name:"repeat", prepend:"", spec: ControlSpec(4, 32, \linear, 1)),
     (name:"group", prepend:"-c", spec: ControlSpec(10, 250, \linear, 1))
     ],
@@ -43,7 +43,7 @@ CDPGui.view(
 
 ( // Omit A out of every B 'wavecycles', replacing with silence
 
-CDPGui.view(
+CDPGui(
 	"distort omit", "Omit", ~directory,
 	[
 		(name:"omit", prepend:"", spec: ControlSpec(4, 16, \linear, 1)),
@@ -56,7 +56,7 @@ CDPGui.view(
 
 ( // Divide, Distortion by dividing 'wavecycle' frequency
 
-CDPGui.view(
+CDPGui(
 	"distort divide", "Divide", ~directory,
 	[
 		(name:"divider", prepend:"", spec: ControlSpec(2, 16, \linear, 1))
@@ -66,7 +66,7 @@ CDPGui.view(
 
 ( // Multiply, Distortion by multiplying 'wavecycle' frequency
 
-CDPGui.view(
+CDPGui(
 	"distort multiply", "Multiply", ~directory,
 	[
 		(name:"multiplier", prepend:"", spec: ControlSpec(2, 16, \linear, 1))
@@ -76,7 +76,7 @@ CDPGui.view(
 
 ( // Fractal, Superimpose 'wavecycles' onto themselves
 
-CDPGui.view(
+CDPGui(
 	"distort fractal", "Fractal", ~directory,
 	[
 		(name:"scaling", prepend:"", spec: ControlSpec(200, 1000, \linear, 1)),
@@ -87,7 +87,7 @@ CDPGui.view(
 
 ( // Telescope, Time-contract by telescoping N wavecycles into 1
 
-CDPGui.view(
+CDPGui(
 	"distort telescope", "Telescope", ~directory,
 	[
 		(name:"group", prepend:"", spec: ControlSpec(2, 100, \linear, 1))
@@ -97,7 +97,7 @@ CDPGui.view(
 
 ( // Envel, Impose envelope on groups
 
-CDPGui.view(
+CDPGui(
 	"distort envel 2", "Envel", ~directory,
 	[
 		(name:"group", prepend:"", spec: ControlSpec(2, 100, \linear, 1)),
@@ -108,7 +108,7 @@ CDPGui.view(
 
 ( // Replace Cycles
 
-CDPGui.view(
+CDPGui(
 	"distort replace", "Replace", ~directory,
 	[(name:"cyclecnt", prepend:"", spec: ControlSpec(4, 16, \linear, 1))]);
 )
