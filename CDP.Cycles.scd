@@ -5,32 +5,36 @@
 ////////////////////////////////////////////////////////////////
 
 
-( // Load CDP GUIs (if needed)
+// Set the directory to your working directory or specify it per process
+~directory = "/Users/bjarni/Desktop/material/code/source/"; // thisProcess.nowExecutingPath.dirname;
 
-~guiPath = thisProcess.nowExecutingPath.dirname ++ "/GUI/";
-this.compileFile(~guiPath ++ "CDP.CROSS.scd").value;
-this.compileFile(~guiPath ++ "CDP.FFT.scd").value;
-this.compileFile(~guiPath ++ "CDP.GUI.scd").value;
+s.boot; // Boot the server for playback
 
 )
-
 
 ////////////////////// GUI - Wavecycles ////////////////////////
 
 
 ( // Delete, Time-contract by telescoping N wavecycles into 1
 
-~cdp.value(
- 	(name:"distort delete 2", text:"Delete",
- 	params:[(name:"delete", prepend:"", spec: ControlSpec(4, 32, \linear, 1))]));
+CDPGui.view(
+ 	"distort delete 2", "Delete", ~directory,
+ 	[
+    (name:"delete", prepend:"", spec: ControlSpec(4, 32, \linear, 1))
+    ]
+);
+
 )
 
 
 ( // Repeat, Time-expand by repeating N wavecycles
 
-~cdp.value(
- 	(name:"distort repeat", text:"Repeat",
- 	params:[(name:"repeat", prepend:"", spec: ControlSpec(4, 32, \linear, 1)),(name:"group", prepend:"-c", spec: ControlSpec(10, 250, \linear, 1))]),
+CDPGui.view(
+ 	"distort repeat", "Repeat", , ~directory,
+ 	[
+    (name:"repeat", prepend:"", spec: ControlSpec(4, 32, \linear, 1)),
+    (name:"group", prepend:"-c", spec: ControlSpec(10, 250, \linear, 1))
+    ],
  );
 
 )
@@ -38,70 +42,72 @@ this.compileFile(~guiPath ++ "CDP.GUI.scd").value;
 
 ( // Omit A out of every B 'wavecycles', replacing with silence
 
-~cdp.value(
-	(name:"distort omit", text:"Omit",
-	params:[
+CDPGui.view(
+	"distort omit", "Omit", ~directory,
+	[
 		(name:"omit", prepend:"", spec: ControlSpec(4, 16, \linear, 1)),
 		(name:"group", prepend:"", spec: ControlSpec(4, 16, \linear, 1)),
-    ]));
+    ]
+);
+
 )
 
 
 ( // Divide, Distortion by dividing 'wavecycle' frequency
 
-~cdp.value(
-	(name:"distort divide", text:"Divide",
-	params:[
+CDPGui.view(
+	"distort divide", "Divide", ~directory,
+	[
 		(name:"divider", prepend:"", spec: ControlSpec(2, 16, \linear, 1))
-    ]));
+    ]);
 )
 
 
 ( // Multiply, Distortion by multiplying 'wavecycle' frequency
 
-~cdp.value(
-	(name:"distort multiply", text:"Multiply",
-	params:[
+CDPGui.view(
+	"distort multiply", "Multiply", ~directory,
+	[
 		(name:"multiplier", prepend:"", spec: ControlSpec(2, 16, \linear, 1))
-    ]));
+    ]);
 )
 
 
 ( // Fractal, Superimpose 'wavecycles' onto themselves
 
-~cdp.value(
-	(name:"distort fractal", text:"Fractal",
-	params:[
+CDPGui.view(
+	"distort fractal", "Fractal", ~directory,
+	[
 		(name:"scaling", prepend:"", spec: ControlSpec(200, 1000, \linear, 1)),
 		(name:"gain", prepend:"", spec: ControlSpec(0.1, 1.0, \linear, 0.1))
-    ]));
+    ]);
 )
 
 
 ( // Telescope, Time-contract by telescoping N wavecycles into 1
 
-~cdp.value(
-	(name:"distort telescope", text:"Telescope",
-	params:[
+CDPGui.view(
+	"distort telescope", "Telescope", ~directory,
+	[
 		(name:"group", prepend:"", spec: ControlSpec(2, 100, \linear, 1))
-    ]));
+    ]);
 )
 
 
 ( // Envel, Impose envelope on groups
 
-~cdp.value(
-	(name:"distort envel 2", text:"Envel",
-	params:[
+CDPGui.view(
+	"distort envel 2", "Envel", ~directory,
+	[
 		(name:"group", prepend:"", spec: ControlSpec(2, 100, \linear, 1)),
 		(name:"troughing", prepend:"-t", spec: ControlSpec(0.01, 1.0, \linear, 0.01))
-    ]));
+    ]);
 )
 
 
 ( // Replace Cycles
 
-~cdp.value(
-	(name:"distort replace", text:"Replace",
-	params:[(name:"cyclecnt", prepend:"", spec: ControlSpec(4, 16, \linear, 1))]));
+CDPGui.view(
+	"distort replace", "Replace", ~directory,
+	[(name:"cyclecnt", prepend:"", spec: ControlSpec(4, 16, \linear, 1))]);
 )

@@ -7,11 +7,11 @@
 
 CDPGui {
 
-*view {|process|
+*view {|processName, infoText, directory, processParams|
 
 var win, menu, soundMenu, playing;
 var headerLabel, processLabel, processButton, playButton, soundLabel, paramsLabel;
-var cdpRunner, inputSounds, path, currentY, lastOutput;
+var cdpRunner, inputSounds, currentY, lastOutput;
 var currentSliders, currentNumberBoxes;
 
 /////////////////////// FILES //////////////////////////
@@ -22,14 +22,12 @@ cdpRunner = {|program, input, output, params|
 	(command).runInTerminal;
 };
 
-path = thisProcess.nowExecutingPath.dirname;
-inputSounds = SoundFile.collect(path +/+ "input/*");
-
+inputSounds = SoundFile.collect(directory ++ "*");
 
 /////////////////////// GUI //////////////////////////
 
 // Create the window
-win = Window.new("CDP", Rect(20, 200, 560, 350 + (process.params.size * 50)), scroll: false);
+win = Window.new("CDP", Rect(20, 200, 560, 350 + (processParams.size * 50)), scroll: false);
 win.front;
 win.background = Color.fromHexString("#1e1e1e");
 win.alpha = 0.95;
@@ -49,7 +47,7 @@ win.drawFunc = {
 
 // Set the header label
 headerLabel = StaticText.new(win, Rect(230, 30, 250, 35));
-headerLabel.string = process.text; // "DISTORT";
+headerLabel.string = infoText;
 headerLabel.font = Font("Monaco", 28);
 headerLabel.stringColor = Color.white;
 
@@ -72,7 +70,7 @@ paramsLabel.stringColor = Color.white;
 currentY = 260;
 currentSliders = List();
 currentNumberBoxes = List();
-process.params.do{|item, index|
+processParams.do{|item, index|
 var nb, lbl, slider;
 	nb = NumberBox(win, Rect(420, currentY, 100, 40));  item.postln;
 	lbl = StaticText.new(win, Rect(20, currentY, 250, 25));
@@ -103,15 +101,17 @@ processButton = Button(win, Rect(20, currentY, 250, 40));
 processButton.font = Font("Monaco", 14);
 processButton.states = [["Process", Color.black, Color.fromHexString("#00bfff")]];
 processButton.action = {arg state;
-	var input, output, params, current;
+	var input, output, params, current, outputDirectory;
 	current = inputSounds[soundMenu.value];
 	input = current.path;
-	output = path +/+ "output/"++ (soundMenu.item.replace(".wav", " ") ++ "_" ++ process.name).toLower.replace(" ", "") ++".wav";
+	outputDirectory = directory +/+ "output/";
+	File.mkdir(outputDirectory);
+	output = outputDirectory ++ (soundMenu.item.replace(".wav", " ") ++ "_" ++ processName).toLower.replace(" ", "") ++".wav";
 	params = "";
-	currentNumberBoxes.do{|nb,i| params = params + process.params[i].prepend ++ nb.value};
+	currentNumberBoxes.do{|nb,i| params = params + processParams[i].prepend ++ nb.value};
 
 	if(File.exists(output), { File.delete(output) });
-	cdpRunner.value(process.name, input, output, params);
+	cdpRunner.value(processName, input, output, params);
 	lastOutput = output;
 };
 
