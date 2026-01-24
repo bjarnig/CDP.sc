@@ -137,10 +137,3 @@ CDPBase (Base class with shared utilities)
     ├── CDPBatchCycles (3 cycle-based variations)
     ├── CDPBatchExtend (3 extension variations)
     └── CDPBatchMulti (Complex multi-layered process)
-```
-
-## Credits
-
-- **CDP System**: Trevor Wishart, Richard Dobson, and the Composers Desktop Project
-- **SuperCollider GUI Interface**: Bjarni Gunnarsson
-- **Batch Processing System**: Inspired by CDP.js (Bjarni Gunnarsson)

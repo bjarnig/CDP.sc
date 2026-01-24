@@ -556,7 +556,3 @@ Use **Batch Mode** to:
 - Generate variations for selection
 - Create process chains
 - Build sound design palettes
-
-## Credits
-
-Inspired by the CDP.js batch processing framework by Bjarni Gunnarsson.
