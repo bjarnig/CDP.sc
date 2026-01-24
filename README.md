@@ -8,7 +8,7 @@ SuperCollider frontend for the **Composers Desktop Project (CDP)** sound transfo
 
 ## What is CDP?
 
-The Composers Desktop Project is a comprehensive suite of sound transformation tools developed by Trevor Wishart, Richard Dobson, and others. It specializes in:
+The Composers Desktop Project is a comprehensive suite of sound transformation tools developed by Trevor Wishart, Richard Dobson, and others. It contains, for example:
 
 - **Waveset (Pseudo-wavecycle) Distortion** - Time-domain transformations based on zero-crossings
 - **Spectral Processing** - Frequency-domain manipulations

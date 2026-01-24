@@ -7,11 +7,15 @@
 (
 
 // Set the directory to your working directory or specify it per process
-~directory = "/Users/bjarni/Courses/Classes/CWA/18 - Transformation (CDP)/code/source/"; // thisProcess.nowExecutingPath.dirname;
+~directory = "/Users/bjarni/Desktop/cdp/samples/";
+
+// thisProcess.nowExecutingPath.dirname;
 
 s.boot; // Boot the server for playback
 
 )
+
+
 
 ////////////////////// GUI - Wavecycles ////////////////////////
 
@@ -35,7 +39,7 @@ CDPGui(
     [
     (name:"repeat", prepend:"", spec: ControlSpec(4, 32, \linear, 1)),
     (name:"group", prepend:"-c", spec: ControlSpec(10, 250, \linear, 1))
-    ],
+    ]
  );
 
 )
