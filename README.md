@@ -26,9 +26,13 @@ This repository provides two modes of operation:
 - Provide appropriate parameter ranges and scaling (linear/exponential)
 
 ### Batch Processing Mode
+- **Ranges method** - Just specify parameter ranges (easiest!)
+- **Custom method** - Custom parameter functions for more control
+- **Preset classes** - Built-in batch processes for common workflows
 - Automated processing of entire directories
 - Creative parameter randomization for variations
 - Multi-channel support (mono/stereo/multi-channel)
+- **Multi-pass processing** - Chain transformations across multiple passes (now working correctly!)
 - Process chaining for complex transformations
 - Inspired by the CDP.js framework
 
@@ -75,10 +79,26 @@ CDPGui(
 // Process all .wav files in a directory with random parameters
 ~dir = "/path/to/audio/files/";
 
-// Run a batch process (creates 8 variations per file)
-CDPBatchDistort.process(~dir, 1); // 1 = mono, 2 = stereo
+// Easiest method - just specify parameter ranges:
+CDPBatch.ranges(~dir, 1, [
+    ["distort average", [12, 80], "_average"],
+    ["distort overload 2", [[0.001, 0.025], [0.8, 0.99], [100, 4000]], "_overload"],
+    ["blur scatter", [[3, 12], "4"], "_scatter"]
+]);
 
-// Other batch processes:
+// Multiple passes - reprocess outputs recursively:
+CDPBatch.ranges(~dir, 1, [
+    ["distort average", [12, 80], "_average"]
+], passes: 3);  // Processes 3 times: original -> pass1 -> pass2 -> pass3
+
+// Or use custom parameter functions:
+CDPBatch.custom(~dir, 1, [
+    ["distort average", {|b| b.rrange(12, 80).asString}, "_average"],
+    ["distort repeat", {|b| b.rrange(2, 6).asString + " -c40"}, "_repeat"]
+]);
+
+// Or use preset batch classes:
+CDPBatchDistort.process(~dir, 1); // Creates 8 variations per file
 CDPBatchCycles.process(~dir, 2);   // Cycle-based transformations
 CDPBatchExtend.process(~dir, 1);   // Extension processes
 CDPBatchMulti.process(~dir, 1);    // Complex multi-layered process

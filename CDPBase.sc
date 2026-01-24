@@ -29,6 +29,21 @@ CDPBase {
 		});
 	}
 	
+	// Synchronous version for batch processing
+	*cdpRunnerSync {|program, input, output, params|
+		var command, shellCommand, exitCode;
+		command = program + "\\\"" ++ input ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
+		shellCommand = "/bin/zsh -c \"source ~/.zshrc && " ++ command ++ "\"";
+		shellCommand.postln;
+		exitCode = shellCommand.systemCmd;
+		if(exitCode == 0, {
+			("Process completed successfully!").postln;
+		}, {
+			("Process failed with exit code:" + exitCode).postln;
+		});
+		^exitCode;
+	}
+	
 	*collectInputSounds {|directory|
 		^SoundFile.collect(directory ++ "*");
 	}
@@ -105,13 +120,11 @@ CDPBase {
 		];
 		playButton.action = {|state|
 			var buffer, lastOutput;
-			state.postln;
 			
 			if(state.value == 1, {
 				lastOutput = lastOutputFunc.value;
 				Routine({
 					buffer = Buffer.read(Server.default, lastOutput);
-					buffer.postln;
 					
 					SynthDef(\cdplay, {|out=0, pan=0, rate=1, amp=1.0, buf=0|
 						var signal = PlayBuf.ar(1, buf, rate, 1, 0, 1);
