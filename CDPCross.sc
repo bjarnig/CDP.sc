@@ -82,7 +82,7 @@ CDPCross : CDPBase {
 		currentNumberBoxes.do{|nb,i| params = params + processParams[i].prepend ++ nb.value};
 
 		if(File.exists(output), { File.delete(output) });
-		CDPBase.cdpRunner(processName, inputA ++ "\"" + "\"" ++ inputB, output, params);
+		CDPBase.cdpRunnerCross(processName, inputA, inputB, output, params);
 		lastOutput = output;
 	};
 

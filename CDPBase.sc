@@ -157,6 +157,40 @@ CDPBase {
 		});
 	}
 	
+	// Special version for cross-synthesis with two input files
+	*cdpRunnerCross {|program, inputA, inputB, output, params|
+		var command, shellCommand, outputDir;
+		
+		// Ensure output directory exists
+		outputDir = PathName(output).pathOnly;
+		if(outputDir.size > 0, {
+			File.mkdir(outputDir);
+		});
+		
+		// Build command with two inputs properly quoted
+		command = program + "\\\"" ++ inputA ++ "\\\"" + "\\\"" ++ inputB ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
+		
+		// If we have a specific CDP path, use it directly
+		if(cdpPath.notNil, {
+			var cmdName = program.split($ )[0]; // Get first word (command name)
+			var fullPath = cdpPath ++ cmdName;
+			command = command.replace(cmdName, fullPath);
+			shellCommand = "/bin/zsh -c \"" ++ command ++ "\"";
+		}, {
+			// Otherwise use login shell
+			shellCommand = "/bin/zsh -l -c \"" ++ command ++ "\"";
+		});
+		
+		shellCommand.postln;
+		shellCommand.unixCmd({|exitCode, pid|
+			if(exitCode == 0, {
+				("Process completed successfully!").postln;
+			}, {
+				("Process failed with exit code:" + exitCode).postln;
+			});
+		});
+	}
+	
 	// Synchronous version for batch processing
 	*cdpRunnerSync {|program, input, output, params|
 		var shellCommand, exitCode, outputDir;
