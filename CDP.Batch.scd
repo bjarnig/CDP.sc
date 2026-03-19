@@ -20,11 +20,37 @@ THREE WAYS TO CREATE BATCH PROCESSES:
 3. PRESET CLASSES (Built-in) - Use CDPBatch* classes
    Example: CDPBatchDistort.process(~dir, 1);
 
+PREREQUISITES:
+- CDP (Composers Desktop Project) must be installed
+- Run CDPBase.checkCDPInstalled to verify installation
+
 USAGE:
 1. Set your directory containing .wav files
 2. Set the number of channels (1 for mono, 2 for stereo)
 3. Run one of the processes below
 */
+
+// CHECK CDP INSTALLATION FIRST
+(
+if(CDPBase.checkCDPInstalled, {
+	"CDP is installed and ready to use!".postln;
+}, {
+	"Please install CDP before running batch processes.".postln;
+	"Visit: http://www.composersdesktop.com/".postln;
+	"".postln;
+	"If CDP works in your terminal but not here, set the path manually:".postln;
+	"1. Run 'which distort' in terminal to find CDP location".postln;
+	"2. Then run: CDPBase.setCDPPath(\"/usr/local/bin\")".postln;
+	"   (use your actual CDP path)".postln;
+});
+)
+
+// OR: Set CDP path manually if it's not being found automatically
+// (Uncomment and adjust the path if needed)
+// (
+// CDPBase.setCDPPath("/usr/local/bin");  // Adjust to your CDP location
+// CDPBase.checkCDPInstalled;  // Verify it works
+// )
 
 (
 // Configuration

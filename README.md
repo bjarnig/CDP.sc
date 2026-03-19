@@ -14,6 +14,67 @@ The Composers Desktop Project is a comprehensive suite of sound transformation t
 - **Spectral Processing** - Frequency-domain manipulations
 - **Cross-Synthesis** - Hybrid techniques combining multiple sound sources
 
+## Requirements
+
+**Important:** This quark requires CDP (Composers Desktop Project) to be installed on your system.
+
+### Installing CDP
+
+1. **Download CDP** from: http://www.composersdesktop.com/
+2. **Install** following the instructions for your OS
+3. **Verify installation:**
+   ```bash
+   which distort  # Should show the path to CDP binaries
+   ```
+
+### Troubleshooting Installation
+
+If you get "command not found" errors (exit code 127):
+
+1. **Check if CDP is installed:**
+   ```supercollider
+   CDPBase.checkCDPInstalled;  // Run this in SuperCollider
+   ```
+
+2. **If CDP works in terminal but not in SuperCollider:**
+   
+   This is a common issue where your interactive shell has the PATH but SuperCollider doesn't. 
+   
+   **Solution: Set the CDP path manually in SuperCollider:**
+   ```supercollider
+   // Find where CDP is installed (run in terminal):
+   // which distort
+   
+   // Then in SuperCollider, set the path to the directory containing CDP:
+   CDPBase.setCDPPath("/usr/local/bin");  // Adjust this to your CDP location
+   
+   // Or if CDP is in a custom location:
+   CDPBase.setCDPPath("~/cdpr8/_cdp/_cdprogs");  // ~ and $HOME are supported
+   CDPBase.setCDPPath("$HOME/cdpr8/_cdp/_cdprogs");  // Both work!
+   ```
+   
+   **Common Issue: $HOME not expanding**
+   
+   If you see `PATH='$HOME/...'` in error output (with literal `$HOME`), your shell config uses single quotes which prevent variable expansion. The manual path setting above will fix this!
+   
+   **To make this permanent**, add it to your SuperCollider startup file:
+   - Open: `Platform.userAppSupportDir +/+ "startup.scd"`
+   - Add: `CDPBase.setCDPPath("/usr/local/bin");`
+
+3. **Alternative: Add CDP to system PATH:**
+   - Add CDP bin directory to your shell configuration
+   - For macOS/Linux, add to `~/.zshrc` or `~/.bash_profile`:
+     ```bash
+     export PATH="/path/to/CDP/bin:$PATH"
+     ```
+   - Restart SuperCollider after changing PATH
+
+4. **Test in terminal:**
+   ```bash
+   distort   # Should show CDP distort help, not "command not found"
+   which distort  # Shows the full path to CDP
+   ```
+
 ## Features
 
 This repository provides two modes of operation:

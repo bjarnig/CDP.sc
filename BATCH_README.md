@@ -4,6 +4,40 @@
 
 The CDP Batch Processing system extends the CDP SuperCollider integration with automated batch processing capabilities, inspired by the JavaScript CDP.js framework. This system operates separately from the GUI system, allowing both interactive and automated workflows.
 
+## Prerequisites
+
+**Required:** CDP (Composers Desktop Project) must be installed and available in your system PATH.
+
+### Quick Installation Check
+
+```supercollider
+// Check if CDP is properly installed
+CDPBase.checkCDPInstalled;
+```
+
+If you get an error about CDP not being found:
+
+1. Download and install CDP from: http://www.composersdesktop.com/
+2. Add CDP binaries to your PATH (see main README.md for details)
+3. Restart SuperCollider
+
+### Common Error: Exit Code 127
+
+If you see `Process failed with exit code: 127`, this means the CDP commands are not found in your PATH.
+
+**If CDP works in your terminal but not in SuperCollider**, set the path manually:
+
+```supercollider
+// Find CDP location in terminal: which distort
+// Then in SuperCollider:
+CDPBase.setCDPPath("/usr/local/bin");  // Use your actual CDP path
+
+// Verify it works:
+CDPBase.checkCDPInstalled;
+```
+
+This is often the quickest solution! The path can be added to your startup file to make it permanent.
+
 ## Recent Fixes (Jan 2026)
 
 **Multi-Pass Processing Fix**: Fixed a critical issue where only the first pass would process files when using multiple passes (`passes: 2` or more). 

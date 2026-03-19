@@ -9,38 +9,187 @@ CDPBase {
 	// Color constants
 	classvar <bgColor, <buttonColor, <menuColor;
 	
+	// CDP installation path (can be set manually)
+	classvar <>cdpPath;
+	
 	*initClass {
 		bgColor = Color.fromHexString("#1e1e1e");
 		buttonColor = Color.fromHexString("#00bfff");
 		menuColor = Color.fromHexString("#6e6e6e");
 	}
 	
-	*cdpRunner {|program, input, output, params|
+	// Check if CDP is installed and available
+	*checkCDPInstalled {
+		var shellConfigs = ["~/.zshrc", "~/.bash_profile", "~/.bashrc", "~/.profile"];
+		var testCmd, result, cdpPath;
+		
+		// Try each shell config file
+		shellConfigs.do {|config|
+			if(result.isNil or: {result.size == 0}, {
+				testCmd = "/bin/zsh -c \"test -f" + config + "&& source" + config + "&& which distort 2>/dev/null || which distort 2>/dev/null\"";
+				result = testCmd.unixCmdGetStdOut.trim;
+			});
+		};
+		
+		// If still not found, try common installation locations
+		if(result.size == 0, {
+			var commonPaths = [
+				"/usr/local/bin/distort",
+				"/opt/local/bin/distort",
+				"/opt/homebrew/bin/distort",
+				"~/bin/distort",
+				"/Applications/CDP/distort"
+			];
+			
+			commonPaths.do {|path|
+				if(result.size == 0, {
+					testCmd = "/bin/zsh -c \"test -f" + path + "&& echo" + path ++ "\"";
+					result = testCmd.unixCmdGetStdOut.trim;
+				});
+			};
+		});
+		
+		if(result.size == 0, {
+			"".postln;
+			"ERROR: CDP (Composers Desktop Project) is not installed or not in PATH.".postln;
+			"".postln;
+			"The 'distort' command was not found in:".postln;
+			"  - Your shell PATH".postln;
+			"  - Common installation locations (/usr/local/bin, /opt/local/bin, etc.)".postln;
+			"".postln;
+			"To fix this:".postln;
+			"1. Install CDP from: http://www.composersdesktop.com/".postln;
+			"2. Add CDP to your PATH by adding this to ~/.zshrc or ~/.bash_profile:".postln;
+			"   export PATH=\"/path/to/CDP/bin:$PATH\"".postln;
+			"3. Or use CDPBase.setCDPPath(\"/full/path/to/CDP/bin\") to set it manually".postln;
+			"".postln;
+			^false;
+		});
+		
+		// Store the CDP path for later use
+		cdpPath = PathName(result).pathOnly;
+		if(cdpPath.size > 0, {
+			this.setCDPPath(cdpPath);
+		});
+		
+		("CDP found at:" + result).postln;
+		^true;
+	}
+	
+	// Expand environment variables in a path string
+	*expandPath {|path|
+		var expanded = path;
+		var homeDir = Platform.userHomeDir;
+		
+		// Expand $HOME
+		expanded = expanded.replace("$HOME", homeDir);
+		// Expand ~
+		if(expanded.beginsWith("~/"), {
+			expanded = homeDir ++ expanded[1..];
+		});
+		
+		^expanded;
+	}
+	
+	// Set CDP path manually
+	*setCDPPath {|path|
+		cdpPath = this.expandPath(path);
+		if(cdpPath.endsWith("/").not, {
+			cdpPath = cdpPath ++ "/";
+		});
+		("CDP path set to:" + cdpPath).postln;
+		("Expanded from:" + path).postln;
+	}
+	
+	// Get the full command with proper PATH handling
+	*prBuildCommand {|program, input, output, params|
 		var command, shellCommand;
+		
 		command = program + "\\\"" ++ input ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
-		shellCommand = "/bin/zsh -c \"source ~/.zshrc && " ++ command ++ "\"";
+		
+		// If we have a specific CDP path, use it directly
+		if(cdpPath.notNil, {
+			var cmdName = program.split($ )[0]; // Get first word (command name)
+			var fullPath = cdpPath ++ cmdName;
+			command = command.replace(cmdName, fullPath);
+			shellCommand = "/bin/zsh -c \"" ++ command ++ "\"";
+		}, {
+			// Otherwise try to source shell configs with proper variable expansion
+			// Use -l (login shell) to ensure proper initialization and variable expansion
+			shellCommand = "/bin/zsh -l -c \"" ++ command ++ "\"";
+		});
+		
+		^shellCommand;
+	}
+	
+	*cdpRunner {|program, input, output, params|
+		var shellCommand, outputDir;
+		
+		// Ensure output directory exists
+		outputDir = PathName(output).pathOnly;
+		if(outputDir.size > 0, {
+			File.mkdir(outputDir);
+		});
+		
+		shellCommand = this.prBuildCommand(program, input, output, params);
 		shellCommand.postln;
 		shellCommand.unixCmd({|exitCode, pid|
 			if(exitCode == 0, {
 				("Process completed successfully!").postln;
 			}, {
 				("Process failed with exit code:" + exitCode).postln;
+				if(exitCode == 127, {
+					"".postln;
+					"ERROR: Command not found. CDP may not be installed or not in PATH.".postln;
+					"".postln;
+					"If your PATH shows '$HOME' literally (not expanded):".postln;
+					"  This is a shell quoting issue. Use the manual path setting below.".postln;
+					"".postln;
+					"Try these steps:".postln;
+					"1. Run: CDPBase.checkCDPInstalled".postln;
+					"2. If CDP is installed but not found, set the path manually:".postln;
+					"   CDPBase.setCDPPath(\"~/cdpr8/_cdp/_cdprogs\")  // Example, use your path".postln;
+					"   CDPBase.setCDPPath(\"/usr/local/bin\")  // Or absolute path".postln;
+					"3. Find your CDP path by running 'which distort' in terminal".postln;
+					"".postln;
+				});
 			});
 		});
 	}
 	
 	// Synchronous version for batch processing
 	*cdpRunnerSync {|program, input, output, params|
-		var command, shellCommand, exitCode;
-		command = program + "\\\"" ++ input ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
-		shellCommand = "/bin/zsh -c \"source ~/.zshrc && " ++ command ++ "\"";
+		var shellCommand, exitCode, outputDir;
+		
+		// Ensure output directory exists
+		outputDir = PathName(output).pathOnly;
+		if(outputDir.size > 0, {
+			File.mkdir(outputDir);
+		});
+		
+		shellCommand = this.prBuildCommand(program, input, output, params);
 		shellCommand.postln;
 		exitCode = shellCommand.systemCmd;
-		if(exitCode == 0, {
-			("Process completed successfully!").postln;
-		}, {
-			("Process failed with exit code:" + exitCode).postln;
-		});
+			if(exitCode == 0, {
+				("Process completed successfully!").postln;
+			}, {
+				("Process failed with exit code:" + exitCode).postln;
+				if(exitCode == 127, {
+					"".postln;
+					"ERROR: Command not found. CDP may not be installed or not in PATH.".postln;
+					"".postln;
+					"If your PATH shows '$HOME' literally (not expanded):".postln;
+					"  This is a shell quoting issue. Use the manual path setting below.".postln;
+					"".postln;
+					"Try these steps:".postln;
+					"1. Run: CDPBase.checkCDPInstalled".postln;
+					"2. If CDP is installed but not found, set the path manually:".postln;
+					"   CDPBase.setCDPPath(\"~/cdpr8/_cdp/_cdprogs\")  // Example, use your path".postln;
+					"   CDPBase.setCDPPath(\"/usr/local/bin\")  // Or absolute path".postln;
+					"3. Find your CDP path by running 'which distort' in terminal".postln;
+					"".postln;
+				});
+			});
 		^exitCode;
 	}
 	
