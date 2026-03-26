@@ -103,15 +103,22 @@ CDPBase {
 	
 	// Get the full command with proper PATH handling
 	*prBuildCommand {|program, input, output, params|
-		var command, shellCommand;
+		var command, shellCommand, fullProgram;
 		
-		command = program + "\\\"" ++ input ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
-		
-		// If we have a specific CDP path, use it directly
+		// If we have a specific CDP path, prepend it to the program
 		if(cdpPath.notNil, {
 			var cmdName = program.split($ )[0]; // Get first word (command name)
-			var fullPath = cdpPath ++ cmdName;
-			command = command.replace(cmdName, fullPath);
+			var restOfProgram = program[cmdName.size..]; // Get rest (mode, flags, etc.)
+			fullProgram = cdpPath ++ cmdName ++ restOfProgram;
+		}, {
+			fullProgram = program;
+		});
+		
+		command = fullProgram + "\\\"" ++ input ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
+		
+		// Build shell command
+		if(cdpPath.notNil, {
+			// Direct execution with full path
 			shellCommand = "/bin/zsh -c \"" ++ command ++ "\"";
 		}, {
 			// Otherwise try to source shell configs with proper variable expansion
@@ -159,7 +166,7 @@ CDPBase {
 	
 	// Special version for cross-synthesis with two input files
 	*cdpRunnerCross {|program, inputA, inputB, output, params|
-		var command, shellCommand, outputDir;
+		var command, shellCommand, outputDir, fullProgram;
 		
 		// Ensure output directory exists
 		outputDir = PathName(output).pathOnly;
@@ -167,14 +174,21 @@ CDPBase {
 			File.mkdir(outputDir);
 		});
 		
-		// Build command with two inputs properly quoted
-		command = program + "\\\"" ++ inputA ++ "\\\"" + "\\\"" ++ inputB ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
-		
-		// If we have a specific CDP path, use it directly
+		// If we have a specific CDP path, prepend it to the program
 		if(cdpPath.notNil, {
 			var cmdName = program.split($ )[0]; // Get first word (command name)
-			var fullPath = cdpPath ++ cmdName;
-			command = command.replace(cmdName, fullPath);
+			var restOfProgram = program[cmdName.size..]; // Get rest (mode, flags, etc.)
+			fullProgram = cdpPath ++ cmdName ++ restOfProgram;
+		}, {
+			fullProgram = program;
+		});
+		
+		// Build command with two inputs properly quoted
+		command = fullProgram + "\\\"" ++ inputA ++ "\\\"" + "\\\"" ++ inputB ++ "\\\"" + "\\\"" ++ output ++ "\\\"" + params;
+		
+		// Build shell command
+		if(cdpPath.notNil, {
+			// Direct execution with full path
 			shellCommand = "/bin/zsh -c \"" ++ command ++ "\"";
 		}, {
 			// Otherwise use login shell
