@@ -26,8 +26,8 @@ CDPBase {
 		// Try each shell config file
 		shellConfigs.do {|config|
 			if(result.isNil or: {result.size == 0}, {
-				testCmd = "/bin/zsh -c \"test -f" + config + "&& source" + config + "&& which distort 2>/dev/null || which distort 2>/dev/null\"";
-				result = testCmd.unixCmdGetStdOut.trim;
+				testCmd = "/bin/zsh -c \"test -f" + config + "&& source" + config + "&& command -v distort || command -v distort\"";
+				result = testCmd.unixCmdGetStdOut.stripWhiteSpace;
 			});
 		};
 		
@@ -44,7 +44,7 @@ CDPBase {
 			commonPaths.do {|path|
 				if(result.size == 0, {
 					testCmd = "/bin/zsh -c \"test -f" + path + "&& echo" + path ++ "\"";
-					result = testCmd.unixCmdGetStdOut.trim;
+					result = testCmd.unixCmdGetStdOut.stripWhiteSpace;
 				});
 			};
 		});
